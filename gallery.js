@@ -1,5 +1,5 @@
 // HOT BRANDS™ — Gallery JS
-
+const IMG = 'https://pub-a217d12273d04376985a75209b836769.r2.dev'; // ← your R2 public URL
 /* ── DATA ──
    Assign your images here. span: 'normal' (all items use 'normal' so the
    grid stays a clean, uniform rectangle — no wide/full spans, no gaps).
@@ -81,10 +81,10 @@ function buildGrid(filter) {
 
     let mediaHTML = '';
     if (item.type === 'video') {
-      mediaHTML = `<video src="img/${item.file}" muted loop playsinline preload="metadata"></video>
+      mediaHTML = `<video src="${IMG}/${item.file}" muted loop playsinline preload="metadata"></video>
                    <div class="gi-play">▶</div>`;
     } else {
-      mediaHTML = `<img src="img/${item.file}" alt="${item.caption || 'HOT BRANDS'}" loading="lazy">`;
+      mediaHTML = `<img src="${IMG}/${item.file}" alt="${item.caption || 'HOT BRANDS'}" loading="lazy">`;
     }
 
     const overlay = (item.caption || item.sub)
@@ -148,9 +148,9 @@ function _showLb() {
   if (!item) return;
   const media = document.getElementById('lbMedia');
   if (item.type === 'video') {
-    media.innerHTML = `<video src="img/${item.file}" controls autoplay muted playsinline style="max-width:100%;max-height:75vh;"></video>`;
+    media.innerHTML = `<video src="${IMG}/${item.file}" controls autoplay muted playsinline style="max-width:100%;max-height:75vh;"></video>`;
   } else {
-    media.innerHTML = `<img src="img/${item.file}" alt="${item.caption || ''}">`;
+    media.innerHTML = `<img src="${IMG}/${item.file}" alt="${item.caption || ''}">`;
   }
   document.getElementById('lbCaption').textContent = item.caption || '';
   document.getElementById('lbSub').textContent     = item.sub || '';
