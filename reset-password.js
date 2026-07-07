@@ -7,7 +7,7 @@ function showError(msg) {
     <div class="headline">"LINK<br><em>EXPIRED."</em></div>
     <p class="sub">Something went wrong</p>
     <div class="msg error">${msg}</div>
-    <a href="signup-v2.html" class="back">← Request a new reset link</a>`;
+    <a href="index.html" class="back">← Request a new reset link</a>`;
 }
 
 function showForm() {
@@ -26,7 +26,7 @@ function showForm() {
         autocomplete="new-password" placeholder="Same password again">
     </div>
     <button class="btn" id="submitBtn">Set New Password</button>
-    <a href="signup-v2.html" class="back">← Back to login</a>`;
+    <a href="index.html" class="back">← Back to login</a>`;
 
   document.getElementById('submitBtn').addEventListener('click', submitNewPassword);
   document.getElementById('pw2').addEventListener('keyup', e => {
@@ -67,7 +67,7 @@ async function submitNewPassword() {
     <div class="headline">"ALL<br><em>GOOD."</em></div>
     <p class="sub">Password updated successfully</p>
     <div class="msg success">Your password has been reset. Log in with your new password.</div>
-    <a href="signup-v2.html" class="back" style="display:block;margin-top:0;">
+    <a href="index.html" class="back" style="display:block;margin-top:0;">
       <button class="btn" style="margin-top:0;">Go to Log In</button>
     </a>`;
 }
