@@ -34,8 +34,8 @@
     <!-- ═══════ LEFT — EDITORIAL CAROUSEL ═══════ -->
     <div class="carousel">
       <div v-for="(s, i) in slides" :key="i" :class="['slide', {on: slide===i}]">
-        <video v-if="s.type==='video'" id="hb-video" :src="'img/'+s.file" playsinline muted preload="metadata"></video>
-        <img v-else :src="'img/'+s.file" :alt="s.label" loading="lazy">
+        <video v-if="s.type==='video'" id="hb-video" :src="'https://pub-a217d12273d04376985a75209b836769.r2.dev/' + s.file" playsinline muted preload="metadata"></video>
+        <img v-else :src="'https://pub-a217d12273d04376985a75209b836769.r2.dev/' + s.file" :alt="s.label" loading="lazy">
       </div>
       <div class="carousel-ui">
         <div class="slide-meta">
