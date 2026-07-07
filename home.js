@@ -9,7 +9,7 @@ document.body.style.visibility = 'hidden';
     const { data: { session } } = await window.sb.auth.getSession();
 
     if (!session) {
-      window.location.replace('signup-v2.html');
+      window.location.replace('/');
       return;
     }
 

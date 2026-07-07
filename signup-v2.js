@@ -136,7 +136,7 @@ createApp({
       loading.value = true;
       try {
         // redirectTo must be the full URL of your reset page
-        const resetUrl = window.location.href.replace('signup-v2.html', 'reset-password.html');
+        const resetUrl = window.location.origin + '/reset-password.html';
         const { error: err } = await window.sb.auth.resetPasswordForEmail(form.email, {
           redirectTo: resetUrl,
         });

@@ -36,7 +36,7 @@ window.Cart = (() => {
     if (window.sb) await window.sb.auth.signOut();
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(CART_KEY);
-    window.location.replace('signup-v2.html');
+    window.location.replace('/');
   }
 
   /* ── DRAWER ── */
