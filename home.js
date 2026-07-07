@@ -1,4 +1,51 @@
 // HOT BRANDS™ — Home / Shop JS
+const IMG = 'https://pub-a217d12273d04376985a75209b836769.r2.dev';
+
+// ── AUTH GUARD ────────────────────────────────────────────
+document.body.style.visibility = 'hidden';
+
+(async () => {
+  try {
+    const { data: { session } } = await window.sb.auth.getSession();
+
+    if (!session) {
+      window.location.replace('signup-v2.html');
+      return;
+    }
+
+    const { data: profile } = await window.sb
+      .from('profiles').select('*').eq('id', session.user.id).single();
+
+    if (!profile?.first_name) {
+      // First-time user with no name stored yet
+      const meta  = session.user.user_metadata || {};
+      const full  = meta.full_name || meta.name || '';
+      const parts = full.split(' ');
+      const first = meta.given_name  || parts[0] || 'Customer';
+      const last  = meta.family_name || parts.slice(1).join(' ') || '';
+      await window.sb.from('profiles').upsert({
+        id: session.user.id, first_name: first, last_name: last
+      });
+      Cart.setUser({ first, last, email: session.user.email });
+    } else {
+      Cart.setUser({
+        first: profile.first_name,
+        last:  profile.last_name  || '',
+        email: session.user.email,
+        phone: profile.phone      || '',
+      });
+    }
+
+  } catch (e) {
+    console.warn('Auth check failed:', e.message);
+  }
+
+  document.body.style.visibility = 'visible';
+  initApp();
+})();
+
+// ── APP ───────────────────────────────────────────────────
+function initApp() {
 
 /* ── THEME ── */
 const THEME = { current: 'dark' };
@@ -21,6 +68,7 @@ document.querySelectorAll('.hotspot').forEach(hs => {
   hs.addEventListener('mouseleave', () => {});
   hs.addEventListener('click', () => openShop(hs.dataset.cat));
 });
+
 /* ── MOBILE CATEGORY CARDS ── */
 document.querySelectorAll('.mob-cat').forEach(btn => {
   btn.addEventListener('click', () => openShop(btn.dataset.cat));
@@ -32,20 +80,14 @@ document.getElementById('navShopLink').addEventListener('click', e => { e.preven
 
 /* ── PRODUCTS ── */
 const products = [
-  { id:1,  name:'Flame SkullCap',      cat:'hats',  price:8500,  colors:['#D81C1C','#0B0B0B','#F4F1EA'], coming:false },
-  // { id:2,  name:'5-Panel Street Cap',  cat:'hats',  price:7200,  colors:['#0B0B0B','#888888'],            coming:false },
-  // { id:3,  name:'HOT Dad Hat',         cat:'hats',  price:6500,  colors:['#D81C1C','#888888'],            coming:false },
-  // { id:4,  name:'Embroidered Beanie',  cat:'hats',  price:5500,  colors:['#0B0B0B','#D81C1C'],            coming:false },
-  { id:5,  name:'Ancestors Tee', cat:'torso', price:12000, colors:['#F4F1EA','#0B0B0B','#D81C1C'], coming:false,  img:'anc1.png' },
-  { id:6,  name:'Skate Hoodie',        cat:'torso', price:22000, colors:['#0B0B0B','#F4F1EA'],            coming:false },
-  { id:7,  name:'Branded Crewneck',    cat:'torso', price:18500, colors:['#888888','#0B0B0B'],            coming:false },
-  // { id:8,  name:'Logo Longsleeve',     cat:'torso', price:13500, colors:['#D81C1C','#0B0B0B'],            coming:false },
-  // { id:9,  name:'Utility Coach Jacket',cat:'torso', price:35000, colors:['#0B0B0B'],                     coming:false },
-  { id:10, name:'Street Cargo Pants',  cat:'legs',  price:28000, colors:['#0B0B0B','#888888'],            coming:false },
-  // { id:11, name:'Waxed Skate Jeans',   cat:'legs',  price:25000, colors:['#1a1a1a'],                     coming:false },
-  // { id:12, name:'HOT Shorts',          cat:'legs',  price:14000, colors:['#0B0B0B','#D81C1C'],            coming:false },
-  // { id:13, name:'Low Cup Sole',        cat:'kicks', price:45000, colors:['#F4F1EA','#0B0B0B'],            coming:true  },
-  // { id:14, name:'HOT Skate Mid',       cat:'kicks', price:52000, colors:['#D81C1C','#0B0B0B'],            coming:true  },
+  { id:1,  name:'FP Flame SkullCap',    cat:'hats',  price:8500,  colors:['#0B0B0B','#F4F1EA'], coming:false, img:'skully1.jpg',  sizes:['Free Size'] },
+  { id:2,  name:'LP Flame SkullCap',    cat:'hats',  price:8500,  colors:['#0B0B0B','#F4F1EA'], coming:false, img:'skully2.jpg',  sizes:['Free Size'] },
+  { id:5,  name:'Ancestors Tee x3',     cat:'torso', price:32000, colors:['#c7c7c7','#0B0B0B','#F4F1EA'], coming:false, img:'anc1.png' },
+  { id:6,  name:'Moremi Ancestor Tee',  cat:'torso', price:12000, colors:['#0B0B0B','#c7c7c7'], coming:false, img:'anc3.jpg' },
+  { id:8,  name:'IconBaby Longsleeve',  cat:'torso', price:13500, colors:['#0B0B0B'], coming:false, img:'img-17.png' },
+  { id:9,  name:'IconBaby shortSleeve', cat:'torso', price:15000, colors:['#0B0B0B'], coming:false, img:'img-05.jpg' },
+  { id:10, name:'HB Sweats',            cat:'legs',  price:28000, colors:['#0B0B0B','#888888'], coming:false, img:'img-09.jpg' },
+  { id:11, name:'HB Jorts',             cat:'legs',  price:25000, colors:['#c7c7c7'], coming:false, img:'img-11.jpg' },
 ];
 
 const cardPalette = {
@@ -83,22 +125,16 @@ function productCardHTML(p, idx) {
   const badge = p.coming
     ? `<div class="cs-overlay"><div class="cs-label">Coming Soon</div><button class="cs-btn" onclick="event.stopPropagation()">Notify Me</button></div>`
     : `<div class="hover-tag">Quick View</div>`;
-
-  // Use real image if provided, fall back to SVG placeholder
   const art = p.img
-    ? `<img src="img/${p.img}" alt="${p.name}" loading="lazy">`
+    ? `<img src="${IMG}/${p.img}" alt="${p.name}" loading="lazy">`
     : `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
          <rect width="300" height="400" fill="${c1}"/>
          ${svgArt(p, c1, c2)}
        </svg>`;
-
   return `
     <div class="product-card card-anim" style="animation-delay:${idx*40}ms"
          data-id="${p.id}" data-cat="${p.cat}" data-coming="${p.coming}">
-      <div class="product-card-img">
-        ${art}
-        ${badge}
-      </div>
+      <div class="product-card-img">${art}${badge}</div>
       <div class="product-card-info">
         <div class="product-card-cat">${p.cat}</div>
         <div class="product-card-name">${p.name}</div>
@@ -156,53 +192,39 @@ document.getElementById('productGrid').addEventListener('click', e => {
 
 /* ── QUICK VIEW ── */
 const SIZES = {
-  hats:  ['Free Size', 'S/M', 'L/XL'],
+  hats:  ['Free Size','S/M','L/XL'],
   torso: ['XS','S','M','L','XL','XXL'],
   legs:  ['28','30','32','34','36'],
   kicks: ['38','39','40','41','42','43','44'],
 };
-
-let qvProduct = null;
-let qvSize    = null;
-let qvColor   = null;
+let qvProduct = null, qvSize = null, qvColor = null;
 
 function openQuickView(product) {
-  qvProduct = product;
-  qvSize    = null;
-  qvColor   = product.colors[0] || null;
-
+  qvProduct = product; qvSize = null; qvColor = product.colors[0] || null;
   const [c1, c2] = cardPalette[product.cat] || ['#333','#D81C1C'];
   document.getElementById('qvCat').textContent   = product.cat.toUpperCase();
   document.getElementById('qvName').textContent  = product.name;
   document.getElementById('qvPrice').textContent = `₦${product.price.toLocaleString()}`;
-
   document.getElementById('qvArt').innerHTML = product.img
-  ? `<img src="img/${product.img}" alt="${product.name}">`
-  : `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-       <rect width="300" height="400" fill="${c1}"/>
-       ${svgArt(product, c1, c2)}
-     </svg>`;
+    ? `<img src="${IMG}/${product.img}" alt="${product.name}">`
+    : `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+         <rect width="300" height="400" fill="${c1}"/>${svgArt(product,c1,c2)}</svg>`;
 
-  // Sizes
-  const sizes = SIZES[product.cat] || ['S','M','L','XL'];
+  const sizes = product.sizes || SIZES[product.cat] || ['S','M','L','XL'];
   document.getElementById('qvSizes').innerHTML = sizes.map(s =>
-    `<button class="qv-size-btn" data-size="${s}">${s}</button>`
-  ).join('');
+    `<button class="qv-size-btn" data-size="${s}">${s}</button>`).join('');
   document.querySelectorAll('.qv-size-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       qvSize = btn.dataset.size;
       document.querySelectorAll('.qv-size-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const addBtn = document.getElementById('qvAdd');
-      addBtn.disabled = false;
-      addBtn.textContent = 'Add to Cart';
+      addBtn.disabled = false; addBtn.textContent = 'Add to Cart';
     });
   });
 
-  // Colors
-  document.getElementById('qvColors').innerHTML = product.colors.map((c, i) =>
-    `<div class="qv-color-btn${i===0?' active':''}" data-color="${c}" style="background:${c};"></div>`
-  ).join('');
+  document.getElementById('qvColors').innerHTML = product.colors.map((c,i) =>
+    `<div class="qv-color-btn${i===0?' active':''}" data-color="${c}" style="background:${c};"></div>`).join('');
   document.querySelectorAll('.qv-color-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       qvColor = btn.dataset.color;
@@ -211,11 +233,8 @@ function openQuickView(product) {
     });
   });
 
-  // Reset add btn
   const addBtn = document.getElementById('qvAdd');
-  addBtn.disabled = true;
-  addBtn.textContent = 'Select a size';
-
+  addBtn.disabled = true; addBtn.textContent = 'Select a size';
   document.getElementById('qvPanel').classList.add('open');
   document.getElementById('qvOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -229,7 +248,6 @@ function closeQuickView() {
 
 document.getElementById('qvClose').addEventListener('click', closeQuickView);
 document.getElementById('qvOverlay').addEventListener('click', closeQuickView);
-
 document.getElementById('qvAdd').addEventListener('click', () => {
   if (!qvProduct || !qvSize) return;
   Cart.addItem({
@@ -240,18 +258,14 @@ document.getElementById('qvAdd').addEventListener('click', () => {
   });
   closeQuickView();
 });
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeQuickView();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQuickView(); });
 
 /* ── FILTER + SORT ── */
 document.querySelectorAll('.filter-pill').forEach(btn => {
   btn.addEventListener('click', () => renderGrid(btn.dataset.filter));
 });
 document.getElementById('sortSelect').addEventListener('change', e => {
-  activeSort = e.target.value;
-  renderGrid(activeFilter);
+  activeSort = e.target.value; renderGrid(activeFilter);
 });
 
 /* ── VIEW SWITCHING ── */
@@ -273,3 +287,5 @@ document.getElementById('backBtn').addEventListener('click', showHub);
 
 /* ── INIT ── */
 Cart.init();
+
+} // end initApp
