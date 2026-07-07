@@ -1,5 +1,4 @@
 // HOT BRANDS™ — Shared Cart Manager
-// Replace WA_NUMBER with your real WhatsApp business number
 
 window.Cart = (() => {
   const CART_KEY = 'hb-cart';
@@ -7,16 +6,12 @@ window.Cart = (() => {
   const WA_NUMBER = '2349139933721';
 
   /* ── STATE ── */
-  function getItems() {
-    try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { return []; }
-  }
+  function getItems() { try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { return []; } }
   function save(items) { localStorage.setItem(CART_KEY, JSON.stringify(items)); _badge(); _render(); }
-  function getUser() {
-    try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; }
-  }
-  function setUser(u) { localStorage.setItem(USER_KEY, JSON.stringify(u)); }
-  function getTotal() { return getItems().reduce((s, i) => s + i.price * i.qty, 0); }
-  function getCount() { return getItems().reduce((s, i) => s + i.qty, 0); }
+  function getUser()   { try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
+  function setUser(u)  { localStorage.setItem(USER_KEY, JSON.stringify(u)); }
+  function getTotal()  { return getItems().reduce((s,i) => s + i.price * i.qty, 0); }
+  function getCount()  { return getItems().reduce((s,i) => s + i.qty, 0); }
 
   /* ── MUTATIONS ── */
   function addItem(product) {
@@ -34,6 +29,14 @@ window.Cart = (() => {
     const items = getItems();
     const found = items.find(i => String(i.id)===String(id) && i.size===size && i.color===color);
     if (found) { found.qty = qty; save(items); }
+  }
+
+  /* ── SIGN OUT ── */
+  async function signOut() {
+    if (window.sb) await window.sb.auth.signOut();
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(CART_KEY);
+    window.location.replace('signup-v2.html');
   }
 
   /* ── DRAWER ── */
@@ -59,8 +62,22 @@ window.Cart = (() => {
     const drawer = document.getElementById('cartDrawer');
     if (!drawer) return;
     const items = getItems(), user = getUser();
+
+    // Greeting
     const greet = drawer.querySelector('.cart-greeting');
     if (greet) greet.textContent = user?.first ? `Hey, ${user.first}.` : 'Your Cart.';
+
+    // Sign out button in header
+    const head = drawer.querySelector('.cart-head');
+    if (head && !head.querySelector('.cart-signout')) {
+      const so = document.createElement('button');
+      so.className = 'cart-signout';
+      so.textContent = 'Sign Out';
+      so.onclick = signOut;
+      head.appendChild(so);
+    }
+
+    // Items
     const list = drawer.querySelector('.cart-items');
     if (list) {
       list.innerHTML = !items.length
@@ -80,8 +97,12 @@ window.Cart = (() => {
             </div>
           </div>`).join('');
     }
+
+    // Total
     const totEl = drawer.querySelector('.cart-total-amount');
     if (totEl) totEl.textContent = `₦${getTotal().toLocaleString()}`;
+
+    // Footer
     const footer = drawer.querySelector('.cart-footer');
     if (footer) footer.style.display = items.length ? 'block' : 'none';
   }
@@ -99,14 +120,8 @@ window.Cart = (() => {
           <button class="dm-x" id="dmClose">✕</button>
         </div>
         <div class="dm-body">
-          <div class="dm-field">
-            <label class="dm-lbl">DELIVERY CITY</label>
-            <input class="dm-inp" id="dmCity" type="text" placeholder="e.g. Lagos, Abuja, Port Harcourt, Uyo">
-          </div>
-          <div class="dm-field">
-            <label class="dm-lbl">DELIVERY ADDRESS</label>
-            <input class="dm-inp" id="dmAddress" type="text" placeholder="Street, area, nearest landmark">
-          </div>
+          <div class="dm-field"><label class="dm-lbl">DELIVERY CITY</label><input class="dm-inp" id="dmCity" type="text" placeholder="e.g. Lagos, Abuja, Port Harcourt, Uyo"></div>
+          <div class="dm-field"><label class="dm-lbl">DELIVERY ADDRESS</label><input class="dm-inp" id="dmAddress" type="text" placeholder="Street, area, nearest landmark"></div>
           <div class="dm-field">
             <label class="dm-lbl">PAYMENT PREFERENCE</label>
             <select class="dm-inp dm-sel" id="dmPayment">
@@ -116,10 +131,7 @@ window.Cart = (() => {
               <option value="Online — Paystack">Online — Paystack</option>
             </select>
           </div>
-          <div class="dm-field">
-            <label class="dm-lbl">NOTES <span style="opacity:.4;font-weight:400;letter-spacing:0;text-transform:none">(optional)</span></label>
-            <input class="dm-inp" id="dmNotes" type="text" placeholder="Special instructions, alternate contact, etc.">
-          </div>
+          <div class="dm-field"><label class="dm-lbl">NOTES <span style="opacity:.4;font-weight:400;letter-spacing:0;text-transform:none">(optional)</span></label><input class="dm-inp" id="dmNotes" type="text" placeholder="Special instructions, alternate contact, etc."></div>
         </div>
         <div class="dm-err" id="dmErr" style="display:none;">Please fill in city, address and payment preference.</div>
         <button class="dm-submit" id="dmSubmit">
@@ -133,15 +145,7 @@ window.Cart = (() => {
     s.textContent = `
       .dm-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.78);opacity:0;pointer-events:none;transition:opacity 300ms ease;}
       .dm-overlay.open{opacity:1;pointer-events:auto;}
-      .dm-panel{
-        position:fixed;top:50%;left:50%;z-index:301;
-        transform:translate(-50%,-50%) scale(.96);
-        width:min(480px,calc(100vw - 24px));
-        background:var(--card,#111111);
-        border:1px solid var(--card-border,rgba(255,255,255,0.07));
-        opacity:0;pointer-events:none;
-        transition:opacity 280ms ease,transform 280ms ease;
-      }
+      .dm-panel{position:fixed;top:50%;left:50%;z-index:301;transform:translate(-50%,-50%) scale(.96);width:min(480px,calc(100vw - 24px));background:var(--card,#111111);border:1px solid var(--card-border,rgba(255,255,255,0.07));opacity:0;pointer-events:none;transition:opacity 280ms ease,transform 280ms ease;}
       .dm-panel.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
       .dm-head{padding:22px 22px 16px;border-bottom:1px solid var(--card-border,rgba(255,255,255,0.07));display:flex;align-items:flex-start;justify-content:space-between;}
       .dm-title{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.06em;color:var(--text,#F4F1EA);}
@@ -154,12 +158,13 @@ window.Cart = (() => {
       .dm-inp{width:100%;background:transparent;border:none;border-bottom:1px solid var(--inp-border,#2e2e2e);padding:9px 0;font-size:14px;color:var(--text,#F4F1EA);font-family:'Inter',sans-serif;outline:none;border-radius:0;transition:border-color 200ms;}
       .dm-inp:focus{border-bottom-color:#D81C1C;}
       .dm-inp::placeholder{color:var(--sub,#888);opacity:.7;}
-      .dm-sel{cursor:pointer;}
-      .dm-sel option{background:#111;color:#F4F1EA;}
+      .dm-sel{cursor:pointer;} .dm-sel option{background:#111;color:#F4F1EA;}
       .dm-inp.dm-error{border-bottom-color:#D81C1C !important;}
       .dm-err{margin:0 22px 10px;padding:10px 14px;background:rgba(216,28,28,0.1);border-left:2px solid #D81C1C;font-size:11px;font-weight:700;letter-spacing:.06em;color:#D81C1C;text-transform:uppercase;}
       .dm-submit{width:100%;padding:16px 20px;background:#D81C1C;color:#fff;border:none;font-family:'Anton',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 200ms;}
       .dm-submit:hover{background:#A91414;}
+      .cart-signout{background:none;border:none;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sub,#888);cursor:pointer;padding:0;margin-left:auto;margin-right:4px;transition:color 180ms;}
+      .cart-signout:hover{color:#D81C1C;}
     `;
     document.head.appendChild(s);
 
@@ -188,11 +193,12 @@ window.Cart = (() => {
     document.body.style.overflow = '';
   }
 
-  function _submitDelivery() {
+  async function _submitDelivery() {
     const city    = document.getElementById('dmCity')?.value.trim();
     const address = document.getElementById('dmAddress')?.value.trim();
     const payment = document.getElementById('dmPayment')?.value;
     const notes   = document.getElementById('dmNotes')?.value.trim();
+
     let hasError = false;
     [['dmCity',city],['dmAddress',address],['dmPayment',payment]].forEach(([id,val]) => {
       const el = document.getElementById(id);
@@ -204,15 +210,43 @@ window.Cart = (() => {
       if (err) err.style.display = 'block';
       return;
     }
+
+    // Save to Supabase before opening WhatsApp
+    await _saveOrder({ city, address, payment, notes });
+
     _closeDeliveryModal();
     window.open(`https://wa.me/${WA_NUMBER}?text=${_waMsg({city,address,payment,notes})}`, '_blank');
+  }
+
+  async function _saveOrder(delivery) {
+    if (!window.sb) return;
+    try {
+      const items = getItems(), user = getUser();
+      const { data: { session } } = await window.sb.auth.getSession();
+      await window.sb.from('orders').insert({
+        user_id:            session?.user?.id || null,
+        customer_name:      `${user?.first||''} ${user?.last||''}`.trim() || 'Guest',
+        customer_email:     user?.email || '',
+        customer_phone:     user?.phone || '',
+        items:              items,
+        total:              getTotal(),
+        delivery_city:      delivery.city,
+        delivery_address:   delivery.address,
+        payment_preference: delivery.payment,
+        notes:              delivery.notes || '',
+        status:             'pending',
+      });
+    } catch (e) {
+      // WhatsApp still opens even if save fails
+      console.warn('Order save failed:', e.message);
+    }
   }
 
   /* ── WHATSAPP MESSAGE ── */
   function _waMsg(delivery = {}) {
     const items = getItems(), user = getUser();
     let msg = `*HOT BRANDS™ — Order Request*\n\n`;
-    msg += `*Customer:*\n`;
+    msg += `*Customer & Contact:*\n`;
     msg += `Name: ${user?.first||''} ${user?.last||''}\n`;
     if (user?.email) msg += `Email: ${user.email}\n`;
     if (user?.phone) msg += `WhatsApp: ${user.phone}\n`;
@@ -245,5 +279,5 @@ window.Cart = (() => {
     });
   }
 
-  return { init, addItem, remove, updateQty, open, close, getUser, setUser, getItems };
+  return { init, addItem, remove, updateQty, open, close, signOut, getUser, setUser, getItems };
 })();
