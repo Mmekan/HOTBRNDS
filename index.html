@@ -3,183 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HOT BRNDS™ — Access</title>
+<title>HOT BRNDS™ — Access Denied</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Anton&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="signup-v2.css">
 <style>
-  .auth-error{
-    background:rgba(216,28,28,0.1);border-left:2px solid #D81C1C;
-    padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;
-    color:#D81C1C;text-transform:uppercase;margin-bottom:16px;line-height:1.5;
+  :root{ --red:#D81C1C; --red-dark:#A91414; --bone:#F0EDE6; --ink:#0A0A0A; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--ink); color:var(--bone);
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
   }
-  .auth-success{
-    background:rgba(37,211,102,0.1);border-left:2px solid #25D366;
-    padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;
-    color:#25D366;text-transform:uppercase;margin-bottom:16px;line-height:1.5;
+  .card{
+    width:100%; max-width:440px;
+    border:1px solid rgba(255,255,255,0.07);
+    padding:48px 40px 44px;
+    background:#101010;
+    position:relative;
+    overflow:hidden;
   }
-  .cta:disabled{ opacity:.55; cursor:not-allowed; }
-  .back-to-login{
-    display:block;text-align:center;margin-top:14px;
-    font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--muted);text-decoration:none;cursor:pointer;background:none;border:none;
-    width:100%;transition:color 200ms;
+  /* Red corner accent — matches the site's Abloh language */
+  .card::before{
+    content:"";
+    position:absolute; top:0; left:0;
+    width:0; height:0;
+    border-style:solid;
+    border-width:56px 56px 0 0;
+    border-color:var(--red) transparent transparent transparent;
   }
-  .back-to-login:hover{ color:var(--red,#D81C1C); }
+  .brand{
+    font-family:'Anton',sans-serif; font-size:15px;
+    color:var(--red); letter-spacing:.08em;
+    margin-bottom:36px;
+  }
+  /* Big code number behind content */
+  .bg-num{
+    font-family:'Anton',sans-serif;
+    font-size:200px; line-height:1;
+    color:#fff; opacity:.025;
+    position:absolute; bottom:-20px; right:-10px;
+    pointer-events:none; user-select:none;
+    letter-spacing:-.02em;
+  }
+  .headline{
+    font-family:'Anton',sans-serif;
+    font-size:clamp(32px, 8vw, 48px);
+    line-height:.92; letter-spacing:.01em;
+    color:#fff;
+    margin-bottom:8px;
+  }
+  .headline em{ color:var(--red); font-style:normal; }
+  .divider{
+    width:48px; height:2px;
+    background:var(--red);
+    margin:20px 0 22px;
+  }
+  .body-text{
+    font-size:13px; line-height:1.75;
+    color:rgba(240,237,230,0.7);
+    margin-bottom:28px;
+  }
+  .body-text strong{
+    color:#fff;
+    font-weight:900;
+    font-size:14px;
+    display:block;
+    margin-bottom:6px;
+    letter-spacing:.01em;
+  }
+  .season-line{
+    font-family:'Anton',sans-serif;
+    font-size:18px;
+    letter-spacing:.06em;
+    color:var(--red);
+    margin-bottom:28px;
+    text-transform:uppercase;
+  }
+  .contact-block{
+    border-top:1px solid rgba(255,255,255,0.07);
+    padding-top:22px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .contact-label{
+    font-size:9px; font-weight:900;
+    letter-spacing:.18em; text-transform:uppercase;
+    color:#555; margin-bottom:4px;
+  }
+  .contact-link{
+    display:flex; align-items:center; gap:10px;
+    text-decoration:none;
+    color:var(--bone);
+    font-size:13px; font-weight:700;
+    padding:12px 14px;
+    border:1px solid rgba(255,255,255,0.07);
+    transition:border-color 200ms, color 200ms, background 200ms;
+  }
+  .contact-link:hover{
+    border-color:var(--red);
+    background:rgba(216,28,28,0.06);
+    color:#fff;
+  }
+  .contact-link svg{ flex-shrink:0; }
+  .foot{
+    margin-top:28px;
+    font-size:9px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase;
+    color:#333;
+    text-align:center;
+  }
 </style>
 </head>
 <body>
-<div id="app">
-  <div :class="['page', isDark ? 'dk' : 'lt']">
+<div class="card">
+  <div class="bg-num">403</div>
 
-    <!-- ═══════ LEFT — EDITORIAL CAROUSEL ═══════ -->
-    <div class="carousel">
-      <div v-for="(s, i) in slides" :key="i" :class="['slide', {on: slide===i}]">
-        <video v-if="s.type==='video'" id="hb-video" :src="'https://pub-a217d12273d04376985a75209b836769.r2.dev/' + s.file" playsinline muted preload="metadata"></video>
-        <img v-else :src="'https://pub-a217d12273d04376985a75209b836769.r2.dev/' + s.file" :alt="s.label" loading="lazy">
-      </div>
-      <div class="carousel-ui">
-        <div class="slide-meta">
-          <div class="slide-num">{{ slides[slide].num }}</div>
-          <div class="slide-caption">{{ slides[slide].label }}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <button v-for="(s,i) in slides" :key="i" :class="['dot',{on:slide===i}]"
-            :style="slide===i?'width:40px':'width:20px'" @click="goTo(i)"></button>
-          <button class="next-btn" @click="advance">→</button>
-        </div>
-      </div>
-    </div>
+  <div class="brand">HOT BRNDS™</div>
 
-    <!-- ═══════ RIGHT — AUTH PANEL ═══════ -->
-    <div class="auth">
-      <div class="ruler-edge"></div>
-      <div class="auth-body">
-
-        <div class="hb-head">
-          <div class="hb-logo">HOT BRNDS™</div>
-          <div class="hb-byline">Official Access, Est. 2024. HB™</div>
-        </div>
-
-        <!-- TABS — hidden on forgot mode -->
-        <div class="tabs" v-if="mode !== 'forgot'">
-          <button :class="['tab',{on:mode==='signup'}]" @click="mode='signup';error='';success=''">Register</button>
-          <button :class="['tab',{on:mode==='login'}]"  @click="mode='login'; error='';success=''">Log In</button>
-        </div>
-
-        <!-- ── SIGN UP ── -->
-        <template v-if="mode==='signup'">
-          <div class="form-head">"GET<br><span class="accent">ON.</span>"</div>
-          <div class="form-tagline">Join the community.</div>
-
-          <div v-if="error"   class="auth-error">{{ error }}</div>
-          <div v-if="success" class="auth-success">{{ success }}</div>
-
-          <div class="row">
-            <div class="field">
-              <label class="lbl">First Name</label>
-              <input class="inp" type="text" name="fname"
-                autocomplete="given-name" placeholder="First"
-                v-model="form.first" :disabled="loading">
-            </div>
-            <div class="field">
-              <label class="lbl">Last Name</label>
-              <input class="inp" type="text" name="lname"
-                autocomplete="family-name" placeholder="Last"
-                v-model="form.last" :disabled="loading">
-            </div>
-          </div>
-          <div class="field">
-            <label class="lbl">Email</label>
-            <input class="inp" type="email" name="email"
-              autocomplete="email" placeholder="you@email.com"
-              v-model="form.email" :disabled="loading">
-          </div>
-          <div class="field">
-            <label class="lbl">Password</label>
-            <input class="inp" type="password" name="password"
-              autocomplete="new-password" placeholder="Min. 8 characters"
-              v-model="form.pw" :disabled="loading" @keyup.enter="submitForm">
-          </div>
-
-          <button class="cta" @click="submitForm" :disabled="loading">
-            {{ loading ? 'Creating account...' : 'Create Account' }}
-          </button>
-        </template>
-
-        <!-- ── LOG IN ── -->
-        <template v-else-if="mode==='login'">
-          <div class="form-head">"BACK<br><span class="accent">IN."</span></div>
-          <div class="form-tagline">Welcome to the roster.</div>
-
-          <div v-if="error"   class="auth-error">{{ error }}</div>
-          <div v-if="success" class="auth-success">{{ success }}</div>
-
-          <div class="field">
-            <label class="lbl">Email</label>
-            <input class="inp" type="email" name="email"
-              autocomplete="email" placeholder="you@email.com"
-              v-model="form.email" :disabled="loading">
-          </div>
-          <div class="field">
-            <label class="lbl">Password</label>
-            <input class="inp" type="password" name="password"
-              autocomplete="current-password" placeholder="Your password"
-              v-model="form.pw" :disabled="loading" @keyup.enter="submitForm">
-          </div>
-
-          <button class="cta" @click="submitForm" :disabled="loading">
-            {{ loading ? 'Logging in...' : 'Log In' }}
-          </button>
-
-          <button class="back-to-login" style="margin-top:18px;"
-            @click="mode='forgot'; error=''; success=''">
-            Forgot password →
-          </button>
-        </template>
-
-        <!-- ── FORGOT PASSWORD ── -->
-        <template v-else-if="mode==='forgot'">
-          <div class="form-head">"RESET<br><span class="accent">IT."</span></div>
-          <div class="form-tagline">We'll send a link to your email.</div>
-
-          <div v-if="error"   class="auth-error">{{ error }}</div>
-          <div v-if="success" class="auth-success">{{ success }}</div>
-
-          <div class="field" v-if="!success">
-            <label class="lbl">Email</label>
-            <input class="inp" type="email" name="email"
-              autocomplete="email" placeholder="you@email.com"
-              v-model="form.email" :disabled="loading" @keyup.enter="sendReset">
-          </div>
-
-          <button class="cta" @click="sendReset" :disabled="loading" v-if="!success">
-            {{ loading ? 'Sending...' : 'Send Reset Link' }}
-          </button>
-
-          <button class="back-to-login" @click="mode='login'; error=''; success=''">
-            ← Back to Log In
-          </button>
-        </template>
-
-        <div class="auth-foot">
-          <div class="foot-copy">© HB™ 2024<br>AUTHORIZED ACCESS ONLY</div>
-          <div class="toggle" @click="toggleTheme">
-            <span>{{ isDark ? 'DARK' : 'LIGHT' }}</span>
-            <div class="trk"><div class="thm"></div></div>
-          </div>
-        </div>
-
-      </div>
-      <div class="stamp"><span>100%<br>AUTH-<br>ENTIC</span></div>
-    </div>
-
+  <div class="headline">
+    ACCESS<br>
+    <em>DENIED.</em>
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="supabase.js"></script>
-<script src="cart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
-<script src="signup-v2.js"></script>
+  <div class="divider"></div>
+
+  <p class="body-text">
+    <strong>ACCESS HAS BEEN DENIED / LIMITED.</strong>
+    Refer to the developer to grant access.
+  </p>
+
+  <div class="season-line">But remember — it's Hotboy season.</div>
+
+  <div class="contact-block">
+    <div class="contact-label">Need a site like this? Get in touch.</div>
+
+    <a class="contact-link"
+       href="https://wa.me/2349139933721"
+       target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24">
+        <path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+      Text Rellik on WhatsApp — 09139933721
+    </a>
+
+    <a class="contact-link"
+       href="imessage://mmekanessen@icloud.com">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" fill="#007AFF"/>
+        <path d="M8 12h.01M12 12h.01M16 12h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      iMessage — mmekanessen@icloud.com
+    </a>
+  </div>
+
+  <div class="foot">© HB™ — c/o HOTBOY SEASON — RELLIK DEV</div>
+</div>
 </body>
 </html>
